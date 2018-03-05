@@ -1,4 +1,4 @@
-# onBot
+# OnBot
 Cognizant OnBot provides an out of the box solution to resolve the challenges associated with self-service portal by
 connecting people, tools and processes together by means of conversations (aka Conversational DevOps). Cognizant
 OnBot offers a ready to use, pluggable bot ecosystem that can provide DevOps services at real-time inside enterprise
