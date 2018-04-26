@@ -1,0 +1,7 @@
+{
+  "releaseTitle" : "release from api",
+  "releaseVariables" : { },
+  "releasePasswordVariables" : { },
+  "scheduledStartDate" : null,
+  "autoStart" : false
+}

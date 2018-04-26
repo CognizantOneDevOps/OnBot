@@ -1,0 +1,32 @@
+{
+  "name": "OnBots",
+  "version": "1.0.0",
+  "description": "OneDevOps OnBots",
+  "main": "app.js",
+  "scripts": {
+    "test": "test OnBots app",
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "body-parser": "*",
+    "elasticsearch": "^13.1.1",
+    "express": "*",
+    "http": "0.0.0",
+    "https": "^1.0.0",
+    "k8s": "*",
+    "mongojs": "*",
+    "node-rest-client": "*",
+    "node-ssh": "*",
+    "nodemon": "^1.11.0",
+    "path": "*"
+  },
+  "author": "Cognizant",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "engine": {
+    "node": "6.10.x",
+    "npm": "3.10.x"
+  }
+}

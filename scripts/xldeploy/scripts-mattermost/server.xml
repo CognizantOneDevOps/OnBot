@@ -1,0 +1,7 @@
+<tomcat.Server id="Infrastructure/my-new-ci/SampleTomcatServer">
+  <home>/apache-tomcat-8.0.9/</home>
+  <startCommand>service tomcat8 start</startCommand>
+  <stopCommand>service tomcat8 stop</stopCommand>
+  <startWaitTime>10</startWaitTime>
+  <stopWaitTime>10</stopWaitTime>
+</tomcat.Server>

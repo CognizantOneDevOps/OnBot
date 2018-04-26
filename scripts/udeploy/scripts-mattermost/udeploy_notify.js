@@ -1,0 +1,105 @@
+/*******************************************************************************
+*Copyright 2018 Cognizant Technology Solutions
+* 
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not
+* use this file except in compliance with the License.  You may obtain a copy
+* of the License at
+* 
+*   http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+* License for the specific language governing permissions and limitations under
+* the License.
+ ******************************************************************************/
+
+var request = require("request");
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+var function_call = function (udeploy_url, username, password, func, callback_notify) {
+
+
+
+var func = func;
+console.log(func);
+func = func.toLowerCase();
+var second_part_url = '';
+
+if(func == 'application')
+{
+	second_part_url = '/cli/application';
+}
+else if(func == 'component')
+{
+	second_part_url = '/cli/component/?active=true';
+}
+else if(func == 'resource')
+{
+	second_part_url = '/cli/resource';
+}
+else
+{
+	callback_notify("null","Currently this is not supported","null");
+}
+var options = { method: 'GET',
+  url: udeploy_url + second_part_url,
+  auth: {
+    user: username,
+    password: password
+  },
+  qs: { active: 'true' }
+ };
+
+
+setInterval(function(){
+request(options, function (error, response, body) {
+	var second_part_url1 = second_part_url;
+  if (!error){
+                        body = JSON.parse(body);
+                        var length = body.length;
+                       var str = '*ID*\t\t\t*NAME*\t\t\t*ActualName*\t\t\t*Email*\t\t\t*DisplayName*\n';
+  }
+setTimeout(function(){ 
+request(options, function (error_latest, response_latest, body_latest) {
+	second_part_url1 = second_part_url;
+  if (!error){
+                        body_latest = JSON.parse(body_latest);
+                        var length = body_latest.length;
+                       var str = '*ID*\t\t\t*NAME*\t\t\t*ActualName*\t\t\t*Email*\t\t\t*DisplayName*\n';
+								for(i=0;i<body_latest.length;i++)
+								{
+									flag = 0;
+									  for(j=0;j<body.length;j++)
+									  {
+										  if(body_latest[i].name == body[j].name)
+										  {
+											  flag = -1;
+											  break;
+										  }
+									  }
+									  if(flag != -1)
+									  {
+
+										  second_part_url1 = second_part_url1.split("/");
+										  var s = second_part_url1[2].substring(0, second_part_url1[2].length - 0);
+										  console.log('Latest '+s+' added : '+body_latest[i].name);
+										  callback_notify("null",'Latest '+s+' added : '+body_latest[i].name,"null");
+									  }
+								}
+  }
+  });
+
+ }, 5000);
+});
+
+}, 5000);
+}
+
+
+
+
+module.exports = {
+  udeploy_notify: function_call     // MAIN FUNCTION
+
+}

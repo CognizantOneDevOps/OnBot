@@ -1,0 +1,29 @@
+{
+  "id" : "Applications/Release00229",
+  "type" : "xlrelease.Release",
+  "title" : "template from rest api",
+  "scheduledStartDate" : "2017-11-10T15:53:06.949+02:00",
+  "flagStatus" : "OK",
+  "maxConcurrentReleases" : 100,
+  "releaseTriggers" : [ ],
+  "teams" : [ ],
+  "memberViewers" : [ ],
+  "roleViewers" : [ ],
+  "attachments" : [ ],
+  "phases" : [ ],
+  "queryableStartDate" : "2017-11-29T15:53:06.949+02:00",
+  "realFlagStatus" : "OK",
+  "status" : "TEMPLATE",
+  "tags" : [ ],
+  "variables" : [ ],
+  "calendarPublished" : false,
+  "tutorial" : false,
+  "abortOnFailure" : false,
+  "allowConcurrentReleasesFromTrigger" : true,
+  "runningTriggeredReleasesCount" : 0,
+  "createdFromTrigger" : false,
+  "extensions" : [ ],
+  "$metadata" : {
+    "globalVariables" : null
+  }
+}

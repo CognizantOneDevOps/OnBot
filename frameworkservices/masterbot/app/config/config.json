@@ -1,0 +1,24 @@
+{
+	"ElasticSearch":"<Elasticsearch-REST-Url>",
+	"Kubernetes_End_Point":"<Kube-API-Url>",
+	"MongoDB":"<mongodb-ip>",
+	"Certificate_Path":"./certificate.pem",
+	"PrivateKey_path":"./key.pem",
+	"https_port":"8443",
+	"http_port":"8035",
+	"botCollections":["BotStore","Bots"],
+	"dbName":"botstore",
+	"exposeIP":"ipaddr-expose-service",
+	"ENV":[		
+		"MONITOR_INTERVAL=1000",
+		"MONITOR_RETENSION=1",
+		"ELASTIC_SEARCH_IP=<ElasticSearch-IP>",
+		"MONGO_DB_URL=<mongo-db-connection-url>",
+		"ELASTIC_SEARCH_PORT=9200",
+		"MONGO_COUNTER=counters",
+		"MONGO_TICKETIDGEN=ticketIdGenerator",
+		"MONGO_COLL=ticketgenerator",
+		"MONGO_DB_NAME=hubot",
+		"APPROVAL_APP_URL=http://slackapp-ip:port/approval"
+	]	
+}

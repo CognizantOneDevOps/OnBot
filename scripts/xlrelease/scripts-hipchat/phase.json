@@ -1,0 +1,10 @@
+{
+  "id" : "Applications/Release426800536/Phase1",
+  "type" : "xlrelease.Phase",
+  "title" : "phase from rest api",
+  "flagStatus" : "OK",
+  "tasks" : [ ],
+  "release" : "Applications/Release426800536",
+  "status" : "PLANNED",
+  "color" : "#00FF00"
+}

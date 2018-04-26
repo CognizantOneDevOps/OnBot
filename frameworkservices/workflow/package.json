@@ -1,0 +1,17 @@
+{
+  "name": "nodejs-api",
+  "version": "1.0.0",
+  "description": "Slack Application for Bots",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "COGNIZANT",
+  "license": "COGNIZANT",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "dotenv": "^4.0.0",
+    "express": "^4.15.4",
+    "request": "^2.81.0"
+  }
+}

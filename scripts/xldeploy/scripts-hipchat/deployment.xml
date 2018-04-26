@@ -1,0 +1,19 @@
+<deployment type="INITIAL">
+  <application>
+    <udm.DeployedApplication id="Environments/bottest/retailone">
+      <version ref="Applications/retailone/1.0"/>
+      <environment ref="Environments/bottest"/>
+      <deployeds/>
+      <orchestrator>default</orchestrator>
+    </udm.DeployedApplication>
+  </application>
+  <deployeds>
+        <tomcat.WarModule id="Infrastructure/mytomcatserver/mytomcat/mytomcatvirtual/retailone">
+            <deployable ref="Applications/retailone/1.0/retailone"/>
+            <container ref="Infrastructure/mytomcatserver/mytomcat/mytomcatvirtual"/>
+            <placeholders/>
+            <contextRoot>retailone</contextRoot>
+        </tomcat.WarModule>
+    </deployeds>
+  
+</deployment>

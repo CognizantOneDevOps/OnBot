@@ -1,0 +1,2 @@
+<tomcat.VirtualHost id="Infrastructure/my-new-ci/SampleTomcatServer/SampleVirtualHost">
+</tomcat.VirtualHost>

@@ -1,0 +1,8 @@
+{
+  "variables" : [ {
+    "key" : "var2",
+    "value" : "myvalue",
+    "type" : "xlrelease.StringVariable",
+    "id" : "Applications/Release426800536/Variable650095791"
+  } ]
+}

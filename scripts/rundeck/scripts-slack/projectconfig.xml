@@ -1,0 +1,7 @@
+<project>
+    <name>testhubotapi</name>
+    <config>
+        <property key="project.name" value="testhubotapi"/>
+        <!-- ... -->
+    </config>
+</project>

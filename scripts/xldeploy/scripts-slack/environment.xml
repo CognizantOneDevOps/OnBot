@@ -1,0 +1,5 @@
+<udm.Environment id="Environments/testingddev">
+  <members>
+     <ci ref="Infrastructure/my-new-ci/SampleTomcatServer/SampleVirtualHost" />
+  </members>
+</udm.Environment>
