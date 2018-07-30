@@ -1,0 +1,19 @@
+{
+  "name": "nodeservices",
+  "version": "1.0.0",
+  "private": true,
+  "author": "cognizant",
+  "description": "nodeservices",
+  "dependencies": {
+   	"request": "2.83.0",
+	"express": "4.14.1",
+	"sshpk": "1.13.1",
+	"timsort": "0.3.0",
+	"hashmap": "2.3.0",
+	"neode": "0.1.13",
+	"body-parser":"1.18.2"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}

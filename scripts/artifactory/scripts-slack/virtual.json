@@ -1,0 +1,15 @@
+{
+  "key": "virtual-repo1",
+  "rclass" : "virtual",
+  "packageType": "generic",
+  "repositories": [],
+  "description": "The virtual repository public description",
+  "notes": "Some internal notes",
+  "includesPattern": "**/*",
+  "excludesPattern": "",
+  "debianTrivialLayout" : false,
+  "artifactoryRequestsCanRetrieveRemoteArtifacts": false,
+  "keyPair": "keypair1",
+  "pomRepositoryReferencesCleanupPolicy": "discard_active_reference",
+  "defaultDeploymentRepo": ""
+}

@@ -1,0 +1,22 @@
+{
+  "NotificationDefinition":[
+		{"notificationGroupindex":[
+			{"name":""}
+			],
+			"notificationRegex":	""
+		},
+		{"notificationGroupindex":[
+			{"name":""}
+			],
+			"notificationRegex":""
+		}
+		
+	],
+	"ActionDefinition":[
+		{"resolutionGroupindex":[
+			{"name":""}
+			],
+			"resolutionRegex":""
+		}
+	]
+}

@@ -1,0 +1,12 @@
+{
+	/* 
+	JSON structure:
+	"resolutionCommand":{
+		"Action":{
+				"metadataKey":"metadataValue"
+		},
+		"PrimaryKey":{
+		}
+	}
+	*/
+}

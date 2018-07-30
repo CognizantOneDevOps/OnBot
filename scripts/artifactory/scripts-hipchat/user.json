@@ -1,0 +1,12 @@
+{
+  "name": "",
+  "email" : "",
+  "password": "***",
+  "admin": false,
+  "profileUpdatable": true,
+  "disableUIAccess" : false,
+  "internalPasswordDisabled": false,
+  "lastLoggedIn": "",
+  "realm": "Internal",
+  "groups" : []
+}

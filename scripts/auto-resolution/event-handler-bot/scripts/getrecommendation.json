@@ -1,0 +1,7 @@
+{
+	"PrimaryKey":{},
+	"Recommendation":{
+			"RecommendationLabel":""
+		},
+	"DynamicRecommendation":false
+}

@@ -1,0 +1,8 @@
+{
+  /* 
+	JSON structure:
+	"ProblemName":{
+	"metadataKey":"metadataValue"
+  }
+  */
+}
