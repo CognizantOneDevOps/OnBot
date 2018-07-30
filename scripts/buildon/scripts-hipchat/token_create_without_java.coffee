@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 #	NEED NEDB AND REQUEST MODULE. SO USE NPM INSTALL MODULENAME --SAVE
@@ -236,6 +236,7 @@ module.exports = (robot) ->
                setTimeout(run, 5000);
              check_string = 'stop';
        else#*************************************************************** IF WE ALREADY HAVE DOCUMENT IN DATABASE******************************
+        pyservice_url = ''
         repo = second_time_repo;
         branch = second_time_branch;
         message_user_in_room = msg.message.user.name;
@@ -252,6 +253,7 @@ module.exports = (robot) ->
             gitlab_clone = 'http://gitlab-ci-token'.concat(':').concat(final_token).concat('@').concat(ip).concat('/').concat(org).concat('/').concat(repo).concat('.git');
           else
             gitlab_clone = 'http://oauth2'.concat(':').concat(gitlab_service_token).concat('@').concat(ip).concat('/').concat(org).concat('/').concat(repo).concat('.git');
+            pyservice_url = 'http://'+ip+'/'+org+'/'+repo
           clone_download_link = gitlab_clone;
         else
           final_token = doc.token;
@@ -269,7 +271,7 @@ module.exports = (robot) ->
             msg.reply stdout;
             setTimeout (->index.passData stdout),1000
         run = () ->
-          call.callname final_name, repo, branch, pythonservice, clone_download_link, folder_name_in_container, (error, stdout, stderr) ->
+          call.callname final_name, repo, branch, pythonservice, pyservice_url, folder_name_in_container, (error, stdout, stderr) ->
             if error == null
               dt='Build started '.concat(message_user_in_room)
               msg.reply dt;

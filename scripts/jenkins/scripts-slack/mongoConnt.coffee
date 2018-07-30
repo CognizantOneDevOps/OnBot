@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 #Description:
@@ -21,6 +21,11 @@
 #Configuration:
 # MONGO_DB_URL
 # MONGO_COLL
+# MONGO_COUNTER
+# MONGO_TICKETIDGEN
+# MONGO_DB_NAME
+# HUBOT_JENKINS_USERDETAILS
+# HUBOT_JENKINS_INSTANCE
 #
 #COMMANDS:
 # None
@@ -51,13 +56,28 @@ db=MongoClient.connect url, (err, conn) ->
 		console.log 'Unable to connect . Error:', err
 	else
 		console.log 'Connection established to', url
+		#db=conn
 		db=conn.db(name)
-		#use this code snippet if your MONGO_DB_NAME database has authentication enabled (<your_database_username> should have 'readWrite' permission)
-		###db.authenticate '<your_database_username>', '<your_database_password>', (err, response) ->
-			if err
-				console.log err
-			else
-				console.log response###
+
+authorize = (userid,callback) ->
+	users = db.collection(process.env.HUBOT_JENKINS_USERDETAILS)
+	users.findOne { dmid: userid, role: 'admin'}, (err, user) ->
+		if err
+			console.log err
+			callback(err,"Error! Coudn't authenticate userdetails.")
+		else if user == null
+			console.log "NotAuthorized"
+			users.aggregate [{$match: {role: 'admin'}}], (error, doc) ->
+				if err
+					console.log error
+					callback(error, "Oops! you don't have permission for this. Please contact the administrator(s) [Failed to fetch admin list -_-]")
+				else
+					msg = "Oops! you don't have permission for this. Please contact the administrator(s).Here are the list of admins I have:"
+					for i in [0...doc.length]
+						msg += "\n<@"+doc[i].dmid+">"
+				callback("NotAuthorized",msg)
+		else
+			callback(null,user.dmid == userid)
 
 module.exports =
 	getNextSequence: (callback)->
@@ -78,3 +98,31 @@ module.exports =
 				console.log err
 			else
 				console.log "updated counter"
+	
+	getInstance: (userid, callback) ->
+		authorize userid,(error,user) ->
+			if error
+				callback(error,user)
+			else
+				col = db.collection(process.env.HUBOT_JENKINS_INSTANCE)
+				col.aggregate [{ $match: {instancename: { "$exists" : true } }}], (err, result) ->
+					if err
+						console.log err
+						callback(err, result)
+					else
+						callback(null, result)
+	
+	setInstance: (instancename, userid, callback) ->
+		col = db.collection(process.env.HUBOT_JENKINS_INSTANCE)
+		authorize userid,(error,user) ->
+			if error
+				callback(error,user)
+			else
+				col.findOne { instancename: instancename}, (err, result) ->
+					if err
+						console.log err
+						callback(err,"Error! Please check logs")
+					else if(result != null)
+						callback(null, result)
+					else
+						callback('notfound', 'Instance not found')

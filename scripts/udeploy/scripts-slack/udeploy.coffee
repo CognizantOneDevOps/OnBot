@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 ###
@@ -44,6 +44,7 @@ Env to set:
 Dependencies:
 1. request
 ###
+
 
 udeploy_url = process.env.UDEPLOY_URL
 udeploy_user_id = process.env.UDEPLOY_USER_ID
@@ -225,7 +226,7 @@ module.exports = (robot) ->
 			else
 				get_specific_component.get_specific_component component_name, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 					if error == "null"
-						msg.send stdout;
+						msg.send stdout
 						setTimeout (->index.passData stdout),1000
 					else
 						msg.send error;
@@ -716,18 +717,15 @@ module.exports = (robot) ->
 					data = {text: 'Approve Request for deploy application',attachments: [{text: 'click yes to approve Request for deploy application',fallback: 'Yes or No?',callback_id: 'udeployappdeploy',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button', value: tckid },{ name: 'Reject', text: 'Reject',  type: 'button',  value: tckid,confirm: {'title': 'Are you sure?','text': 'Do you want to Reject?','ok_text': 'Reject','dismiss_text': 'No'}}]}]}
 					robot.messageRoom stdout.udeployappdeploy.adminid, data;
 					msg.reply 'Your approval request is waiting from '.concat(stdout.udeployappdeploy.admin);
-
-					
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
 					generate_id.add_in_mongo dataToInsert
-
 			else
 				msg.reply 'Your process is in progress. Once it\'s done you\'ll be notified.';
 				app_deploy.app_deploy udeploy_url, udeploy_user_id, udeploy_password, app_name, app_process, env, version, component, (error, stdout, stderr) ->
 					if error == "null"
-						msg.reply stdout;
+						msg.send stdout;
 					else
-						msg.reply error;
+						msg.send error;
 	
 	robot.router.post '/udeployappdeploy', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
@@ -740,10 +738,9 @@ module.exports = (robot) ->
 					actionmsg = 'u-Deploy application deployed';
 					statusmsg = 'Success';
 					index.wallData botname, message, actionmsg, statusmsg;
-					robot.messageRoom data_http.userid, '';
+					robot.messageRoom data_http.userid, stdout;
 				else
 					setTimeout (->index.passData error),1000
-								
 					robot.messageRoom data_http.userid, error;
 		else
 			robot.messageRoom data_http.userid, 'You are not authorized.';

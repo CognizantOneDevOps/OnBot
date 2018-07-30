@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 #Description:
@@ -23,6 +23,8 @@
 # HUBOT_JENKINS_URL
 # HUBOT_JENKINS_USER
 # HUBOT_JENKINS_PASSWORD
+# HUBOT_JENKINS_API_TOKEN
+# HUBOT_JENKINS_VERSION
 #
 #COMMANDS:
 # start <jobname> build with params <paramname1>=<paramvalue1> <paramname2>=<paramvalue2>... -> start a build for
@@ -38,12 +40,34 @@
 # this file is for building parameterized projects only. If the given job is not parameterized then
 # hubot will respond with error. For non-parameterized jobs user jenkins build <jobaname>.
 
+jenkins_url=process.env.HUBOT_JENKINS_URL
+jenkins_user=process.env.HUBOT_JENKINS_USER
+jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
+jenkins_api=process.env.HUBOT_JENKINS_API_TOKEN
+jenkins_version=process.env.HUBOT_JENKINS_VERSION
+
 request = require('request')
 readjson = require './readjson.js'
 finaljson=" ";
 index = require('./index')
 statuscheck = require('./statuscheck.coffee')
 generate_id = require('./mongoConnt')
+crumb = require('./jenkinscrumb.js')
+
+crumbvalue = ''
+options = {
+url: '',
+auth: {
+'user': jenkins_user,
+'pass': jenkins_api
+},
+method: 'POST',
+headers:{}};
+
+if jenkins_version >= 2.0
+	crumb.crumb (stderr, stdout) ->
+		if(stdout)
+			crumbvalue=stdout
 
 module.exports = (robot) ->
 	robot.respond /start (.*) build with params (.+)/i, (res) ->
@@ -70,9 +94,6 @@ module.exports = (robot) ->
 				jobname=res.match[1]
 				paramString=[]
 				paramString=res.match[2].split(' ')
-				jenkins_url=process.env.HUBOT_JENKINS_URL
-				jenkins_user=process.env.HUBOT_JENKINS_USER
-				jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
 				url=jenkins_url+"/job/"+jobname+"/buildWithParameters?"
 				i=0
 				for i in [0...paramString.length]
@@ -80,14 +101,11 @@ module.exports = (robot) ->
 						url=url+paramString[i]
 					else
 						url=url+paramString[i]+'&'
-				options = {
-				auth: {
-				'user': jenkins_user,
-				'pass': jenkins_pass
-				},
-				method: 'POST',
-				url: url,
-				headers: {  } };
+				options.url = url
+				if jenkins_version >= 2.0
+					options.headers["Jenkins-Crumb"]=crumbvalue
+				else
+					options.auth.pass = jenkins_pass
 				request.post options, (error, response, body) ->
 					console.log response.statusCode
 					if(response.statusCode!=201)
@@ -102,7 +120,10 @@ module.exports = (robot) ->
 						actionmsg = "jenkins build started"
 						statusmsg = "Success"
 						index.wallData process.env.HUBOT_NAME, message, actionmsg, statusmsg;
-						statuscheck.checkbuildstatus res.message.user.room,jobname
+						if jenkins_version >= 2.0
+							statuscheck.checkbuildstatus res.message.user.room,jobname,crumbvalue
+						else
+							statuscheck.checkbuildstatus res.message.user.room,jobname,''
 	#the following code handles the approval flow of the command
 	robot.router.post '/jenkinsbuildwithparam', (req, response) ->
 		recipientid=req.body.userid
@@ -121,14 +142,11 @@ module.exports = (robot) ->
 					url=url+paramString[i]
 				else
 					url=url+paramString[i]+'&'
-			options = {
-			auth: {
-			'user': jenkins_user,
-			'pass': jenkins_pass
-			},
-			method: 'POST',
-			url: url,
-			headers: {  } };
+			options.url = url
+			if jenkins_version >= 2.0
+				options.headers["Jenkins-Crumb"]=crumbvalue
+			else
+				options.auth.pass = jenkins_pass
 			request.post options, (error, response, body) ->
 				console.log response.statusCode
 				if(response.statusCode!=201)
@@ -143,7 +161,10 @@ module.exports = (robot) ->
 					actionmsg = "jenkins build started"
 					statusmsg = "Success"
 					index.wallData process.env.HUBOT_NAME, message, actionmsg, statusmsg;
-					statuscheck.checkbuildstatus recipientid,req.body.jobname
+					if jenkins_version >= 2.0
+						statuscheck.checkbuildstatus recipientid,jobname,crumbvalue
+					else
+						statuscheck.checkbuildstatus recipientid,jobname,''
 		else
 			dt="The build request from "+req.body.username+" was rejected by "+req.body.approver
 			robot.messageRoom recipientid, dt

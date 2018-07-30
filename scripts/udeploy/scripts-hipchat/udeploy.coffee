@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 ###
@@ -100,7 +100,7 @@ module.exports = (robot) ->
 					tckid=id
 					console.log(tckid);
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploycomponentslist.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploycomponentslist',message:msg.message.text}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploycomponentslist.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploycomponentslist.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -116,7 +116,7 @@ module.exports = (robot) ->
 						
 	robot.router.post '/udeploycomponentslist', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			get_all_component.get_all_component udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -137,7 +137,7 @@ module.exports = (robot) ->
 					console.log(tckid);
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeployresourceslist.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeployresourceslist',message:msg.message.text}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeployresourceslist.admin, data);
 					msg.send 'Your request is waiting for approval by '+stdout.udeployresourceslist.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -174,7 +174,7 @@ module.exports = (robot) ->
 					console.log(tckid);
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeployapllicationslist.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeployapllicationslist',message:msg.message.text}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeployapllicationslist.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeployapllicationslist.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -190,7 +190,7 @@ module.exports = (robot) ->
 						
 	robot.router.post '/udeployapllicationslist', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			get_all_application.get_all_application udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -213,7 +213,7 @@ module.exports = (robot) ->
 					console.log(tckid);
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploycomponent.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploycomponent',component_name:component_name,message:msg.message.text}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploycomponent.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploycomponent.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -229,7 +229,7 @@ module.exports = (robot) ->
 						
 	robot.router.post '/udeploycomponent', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			get_specific_component.get_specific_component data_http.component_name, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -252,7 +252,7 @@ module.exports = (robot) ->
 					console.log(tckid);
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeployapplication.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeployapplication',application_name:application_name,message:msg.message.text}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeployapplication.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeployapplication.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -269,7 +269,7 @@ module.exports = (robot) ->
 						
 	robot.router.post '/udeployapplication', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			get_specific_application.get_specific_application data_http.application_name, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -292,7 +292,7 @@ module.exports = (robot) ->
 					console.log(tckid);
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploycomponentapplication.admin,podIp:process.env.MY_POD_IP,componentapplication:componentapplication,callback_id: 'udeploycomponentapplication',message:msg.message.text}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploycomponentapplication.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploycomponentapplication.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -308,7 +308,7 @@ module.exports = (robot) ->
 						
 	robot.router.post '/udeploycomponentapplication', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			get_component_specific_application.get_component_specific_application data_http.componentapplication, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -332,7 +332,7 @@ module.exports = (robot) ->
 					
 						
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeployenvironmentapplication.admin,podIp:process.env.MY_POD_IP,environmentapplication:environmentapplication,callback_id: 'udeployenvironmentapplication',message:msg.message.text}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeployenvironmentapplication.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeployenvironmentapplication.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -348,7 +348,7 @@ module.exports = (robot) ->
 						
 	robot.router.post '/udeployenvironmentapplication', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			get_environment_specific_application.get_environment_specific_application data_http.environmentapplication, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -370,7 +370,7 @@ module.exports = (robot) ->
 					tckid=id
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploycreateresource.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploycreateresource',message:msg.message.text,resource:resource}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploycreateresource.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploycreateresource.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -391,7 +391,7 @@ module.exports = (robot) ->
 	
 	robot.router.post '/udeploycreateresource', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			create_resource.create_resource data_http.resource, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -418,7 +418,7 @@ module.exports = (robot) ->
 					tckid=id
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploydeleteresource.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploydeleteresource',message:msg.message.text,resource:resource,tckid:tckid}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploydeleteresource.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploydeleteresource.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -439,7 +439,7 @@ module.exports = (robot) ->
 	
 	robot.router.post '/udeploydeleteresource', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			delete_resource.delete_resource data_http.resource, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -465,7 +465,7 @@ module.exports = (robot) ->
 					tckid=id
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploycreaterecomponent.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploycreaterecomponent',message:msg.message.text,component:component,tckid:tckid}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploycreaterecomponent.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploycreaterecomponent.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -485,7 +485,7 @@ module.exports = (robot) ->
 	
 	robot.router.post '/udeploycreaterecomponent', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			create_component.create_component data_http.component, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -512,7 +512,7 @@ module.exports = (robot) ->
 					tckid=id
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploycreatereuser.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploycreatereuser',message:msg.message.text,user_name:user_name,tckid:tckid,unique_password:unique_password}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploycreatereuser.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploycreatereuser.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -531,7 +531,7 @@ module.exports = (robot) ->
 	
 	robot.router.post '/udeploycreatereuser', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			create_user.create_user data_http.user_name, data_http.unique_password, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -557,7 +557,7 @@ module.exports = (robot) ->
 					tckid=id
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploydeletereuser.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploydeletereuser',message:msg.message.text,user_name:user_name,tckid:tckid}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploydeletereuser.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploydeletereuser.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -577,7 +577,7 @@ module.exports = (robot) ->
 	
 	robot.router.post '/udeploydeletereuser', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			delete_user.delete_user data_http.user_name, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -603,7 +603,7 @@ module.exports = (robot) ->
 					tckid=id
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeployshowreuser.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeployshowreuser',message:msg.message.text,user_name:user_name}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeployshowreuser.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeployshowreuser.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -619,7 +619,7 @@ module.exports = (robot) ->
 						
 	robot.router.post '/udeployshowreuser', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			info_user.info_user data_http.user_name, udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -640,7 +640,7 @@ module.exports = (robot) ->
 					tckid=id
 					
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeploycreatetoken.admin,podIp:process.env.MY_POD_IP,callback_id: 'udeploycreatetoken',message:msg.message.text,tckid:tckid}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeploycreatetoken.admin, data);
 					msg.send 'Your request is waiting for approval from '+stdout.udeploycreatetoken.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
@@ -661,7 +661,7 @@ module.exports = (robot) ->
 	
 	robot.router.post '/udeploycreatetoken', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			create_token.create_token udeploy_url, udeploy_user_id, udeploy_password, (error, stdout, stderr) ->
 				if error == "null"
@@ -679,7 +679,7 @@ module.exports = (robot) ->
 	
 	#deploy 
 	robot.respond /deploy (.*) process (.*) env (.*) version (.*) component (.*)/i, (msg) ->
-		#eg- deploy HelloWorldAppln process HelloWorldApplnProcess env Dev version 3.0 component HelloWorld
+		#deploy HelloWorldAppln process HelloWorldApplnProcess env Dev version 3.0 component HelloWorld
 		#deploy <app_name> process <process_name> env <environment_name> version <version_number> component <component_name>
 		app_name = msg.match[1];
 		app_process = msg.match[2];
@@ -691,16 +691,13 @@ module.exports = (robot) ->
 			if stdout.udeployappdeploy.workflowflag == true
 				generate_id.getNextSequence (err,id) ->
 					tckid=id
-					
-					
-						
+										
 					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.reply_to,approver:stdout.udeployappdeploy.admin,podIp:pod_ip,callback_id: 'udeployappdeploy',message:msg.message.text,tckid:tckid,app_name:app_name,app_process:app_process,env:env,version:version,component:component}
-					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: ';
+					data='Ticket Id : '+tckid+'\n Raised By: '+msg.message.user.name+'\n Command: '+msg.match[0];
 					robot.messageRoom(stdout.udeployappdeploy.admin, data);
 					msg.send 'Your request is waiting for approval by '+stdout.udeployappdeploy.admin
 					dataToInsert = {ticketid: tckid, payload: payload, "status":"","approvedby":""}
 					generate_id.add_in_mongo dataToInsert
-
 			else
 				msg.reply 'Your process is in progress. Once it\'s done you\'ll be notified.';
 				app_deploy.app_deploy udeploy_url, udeploy_user_id, udeploy_password, app_name, app_process, env, version, component, (error, stdout, stderr) ->
@@ -711,7 +708,7 @@ module.exports = (robot) ->
 	
 	robot.router.post '/udeployappdeploy', (request, response) ->
 		data_http = if request.body.payload? then JSON.parse request.body.payload else request.body
-		if data_http.action == 'Approve'
+		if data_http.action == 'Approved'
 			robot.messageRoom data_http.userid, 'Your request is approved by '.concat(data_http.approver);
 			app_deploy.app_deploy udeploy_url, udeploy_user_id, udeploy_password, data_http.app_name, data_http.app_process, data_http.env, data_http.version, data_http.component, (error, stdout, stderr) ->
 				if error == "null"
@@ -720,10 +717,9 @@ module.exports = (robot) ->
 					actionmsg = 'u-Deploy application deployed';
 					statusmsg = 'Success';
 					index.wallData botname, message, actionmsg, statusmsg;
-					robot.messageRoom data_http.userid, '';
+					robot.messageRoom data_http.userid, stdout;
 				else
 					setTimeout (->index.passData error),1000
-								
 					robot.messageRoom data_http.userid, error;
 		else
 			robot.messageRoom data_http.userid, 'You are not authorized.';

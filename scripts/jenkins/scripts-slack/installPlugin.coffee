@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 #Description:
@@ -23,6 +23,8 @@
 # HUBOT_JENKINS_URL
 # HUBOT_JENKINS_USER
 # HUBOT_JENKINS_PASSWORD
+# HUBOT_JENKINS_API_TOKEN
+# HUBOT_JENKINS_VERSION
 #
 #COMMANDS:
 # install <plugin1> <plugin2>... in jenkins -> install the given plugins to jenkins
@@ -39,6 +41,28 @@ index = require('./index')
 readjson = require './readjson.js'
 finaljson=" ";
 generate_id = require('./mongoConnt');
+crumb = require('./jenkinscrumb.js')
+
+jenkins_url=process.env.HUBOT_JENKINS_URL
+jenkins_user=process.env.HUBOT_JENKINS_USER
+jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
+jenkins_api=process.env.HUBOT_JENKINS_API_TOKEN
+jenkins_version=process.env.HUBOT_JENKINS_VERSION
+
+crumbvalue = ''
+options = {
+url: '',
+auth: {
+'user': jenkins_user,
+'pass': jenkins_api
+},
+method: 'POST',
+headers:{}};
+if jenkins_version >= 2.0
+	crumb.crumb (stderr, stdout) ->
+		console.log stdout
+		if(stdout)
+			crumbvalue=stdout
 
 module.exports = (robot) ->
 	robot.respond /install (.+) in jenkins/i, (res) ->
@@ -64,9 +88,6 @@ module.exports = (robot) ->
 				plugins=[]
 				flag=0
 				pluginString=res.match[1].split(' ')
-				jenkins_url=process.env.HUBOT_JENKINS_URL
-				jenkins_user=process.env.HUBOT_JENKINS_USER
-				jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
 				url=jenkins_url+"/pluginManager/installNecessaryPlugins"
 				pluginData="<jenkins>"
 				for i in [0...pluginString.length]
@@ -80,6 +101,9 @@ module.exports = (robot) ->
 					url: url,
 					headers: {"Content-Type": "text/xml"},
 					body: pluginData};
+					if jenkins_version >= 2.0
+						options.headers["Jenkins-Crumb"]=crumbvalue
+						options.auth.pass = jenkins_api
 					request.post options, (error, response, body) ->
 						if(response.statusCode!=302)
 							dt="Error in installing"
@@ -92,6 +116,9 @@ module.exports = (robot) ->
 				getInstallations = () ->
 					options.url=jenkins_url+"/pluginManager/api/json?depth=1&xpath=/*/*/shortName|/*/*/version&wrapper=plugins"
 					options.headers={"Content-Type": "text/json"}
+					if jenkins_version >= 2.0
+						options.headers["Jenkins-Crumb"]=crumbvalue
+						options.auth.pass = jenkins_api
 					request.post options, (error, response, body) ->
 						plugins=JSON.parse(body).plugins
 				setTimeout ( -> check plugins),2000
@@ -115,7 +142,7 @@ module.exports = (robot) ->
 								res.send dt
 								setTimeout (->index.passData dt),1000
 							flag=0
-		#the following code handles the approval flow of the command
+	#the following code handles the approval flow of the command
 	robot.router.post '/installplugin', (req, response) ->
 		recipientid=req.body.userid
 		if(req.body.action=='Approved')
@@ -126,9 +153,6 @@ module.exports = (robot) ->
 			plugins=[]
 			flag=0
 			pluginString=req.body.userplugin
-			jenkins_url=process.env.HUBOT_JENKINS_URL
-			jenkins_user=process.env.HUBOT_JENKINS_USER
-			jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
 			url=jenkins_url+"/pluginManager/installNecessaryPlugins"
 			pluginData="<jenkins>"
 			for i in [0...pluginString.length]
@@ -142,6 +166,8 @@ module.exports = (robot) ->
 				url: url,
 				headers: {"Content-Type": "text/xml"},
 				body: pluginData};
+				if jenkins_version >= 2.0
+					options.headers["Jenkins-Crumb"]=crumbvalue
 				request.post options, (error, response, body) ->
 					if(response.statusCode!=302)
 						dt="Error in installing"
@@ -154,6 +180,8 @@ module.exports = (robot) ->
 			getInstallations = () ->
 				options.url=jenkins_url+"/pluginManager/api/json?depth=1&xpath=/*/*/shortName|/*/*/version&wrapper=plugins"
 				options.headers={"Content-Type": "text/json"}
+				if jenkins_version >= 2.0
+					options.headers["Jenkins-Crumb"]=crumbvalue
 				request.post options, (error, response, body) ->
 					plugins=JSON.parse(body).plugins
 			setTimeout ( -> check plugins),2000

@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 #Set of bot commands for nexus
@@ -63,7 +63,7 @@ uniqueId = (length=8) ->
 module.exports = (robot) ->
 	cmd = new RegExp('@' + process.env.HUBOT_NAME + ' help')
 	robot.hear cmd, (msg) ->
-		dt = 'list nexus repos\nlist nexus users\nprint nexus repo <repo-id>\nprint nexus user <user-id>\ncreate nexus repo <repo-name>\ndelete nexus repo <repo-id>\ncreate nexus user <user-name> with <role-name> role\nshow artifacts in <groupId>\nlist nexus users\ndelete nexus user <user-id>\nlist nexus privileges\ncreate privilege <privilege name> <tagged repo id>';
+		dt = 'list nexus repos\nlist nexus users\nlist nexus repo <repo-id>\nlist nexus user <user-id>\ncreate nexus repo <repo-name>\ndelete nexus repo <repo-id>\ncreate nexus user <user-name> with <role-name> role\nshow artifacts in <groupId>\ndelete nexus user <user-id>\nlist nexus privileges\ncreate privilege <privilege name> <tagged repo id>';
 		msg.send dt
 		setTimeout (->index.passData dt),1000
 	
@@ -202,7 +202,7 @@ module.exports = (robot) ->
 			dt = 'You are not authorized.'
 			robot.messageRoom data_http.userid, dt;
 			setTimeout (->index.passData dt),1000
-	cmdprint = new RegExp('@' + process.env.HUBOT_NAME + ' print nexus repo (.*)')
+	cmdprint = new RegExp('@' + process.env.HUBOT_NAME + ' list nexus repo (.*)')
 	robot.listen(
 		(message) ->
 			return unless message.text
@@ -292,7 +292,7 @@ module.exports = (robot) ->
 					robot.messageRoom data_http.userid, error;
 		else
 			robot.messageRoom data_http.userid, 'You are not authorized.';
-	cmdprintuser = new RegExp('@' + process.env.HUBOT_NAME + ' print nexus user (.*)')
+	cmdprintuser = new RegExp('@' + process.env.HUBOT_NAME + ' list nexus user (.*)')
 	robot.listen(
 		(message) ->
 			return unless message.text
@@ -648,9 +648,12 @@ module.exports = (robot) ->
 				if(result.length==1)
 					dt = 'No artifacts found for groupId: '+msg.match[1]
 				else
-					dt = '*No.*\t\t\t*Group Id*\t\t\t*Artifact Id*\t\t\t*Version*\t\t\t*Repo Id*\n'
+					dt = '*No.*\t\t\t*Group Id*\t\t\t*Artifact Id*\t\t\t*Version*\t\t\t\t*RepoId*\n'
 					for i in [1...result.length]
-						dt = dt + i+'\t\t\t'+result[i].split('<groupId>')[1].split('</groupId>')[0]+'\t\t\t'+result[i].split('<artifactId>')[1].split('</artifactId>')[0]+'\t\t\t'+result[i].split('<version>')[1].split('</version>')[0]+'\t\t\t'+result[i].split('<latestReleaseRepositoryId>')[1].split('</latestReleaseRepositoryId>')[0]+'\n'
+						if(result[i].indexOf('latestReleaseRepositoryId')!=-1)
+							dt = dt + i+'\t\t\t'+result[i].split('<groupId>')[1].split('</groupId>')[0]+'\t\t'+result[i].split('<artifactId>')[1].split('</artifactId>')[0]+'\t\t'+result[i].split('<version>')[1].split('</version>')[0]+'\t\t'+result[i].split('<latestReleaseRepositoryId>')[1].split('</latestReleaseRepositoryId>')[0]+'\n'
+						else
+							dt = dt + i+'\t\t\t'+result[i].split('<groupId>')[1].split('</groupId>')[0]+'\t\t'+result[i].split('<artifactId>')[1].split('</artifactId>')[0]+'\t\t'+result[i].split('<version>')[1].split('</version>')[0]+'\t\t'+result[i].split('<latestSnapshotRepositoryId>')[1].split('</latestSnapshotRepositoryId>')[0]+'\n'
 				msg.send dt
 				setTimeout (->index.passData dt),1000
 	)

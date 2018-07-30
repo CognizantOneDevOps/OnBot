@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 ###
@@ -63,6 +63,7 @@ module.exports = (robot) ->
 		msg.send 'delete sonar project <project-id>';
 		msg.send 'grant sonar <permission-name> <userid> <projectid>';
 		msg.send 'revoke sonar <permission-name> <userid> <projectid>';
+		msg.send 'getMetrics <projectname>'
 	
 	robot.respond /create sonar project (.*)/i, (msg) ->
 		message = msg.match[0]
@@ -512,3 +513,56 @@ module.exports = (robot) ->
 			# Rejected Message send to the user chat room
 			robot.messageRoom data_http.userid, dt;
 			robot.messageRoom data_http.userid, 'Sorry, You are not authorized to revoke permissions.';
+	
+	robot.respond /getMetrics (.*)/i, (msg) ->
+		project = msg.match[1]
+		request.get sonar_url+'api/projects', (error, response, body) ->
+			if error
+				console.log error
+				dt = "Error! Please check logs."
+				msg.send dt
+				setTimeout (->eindex.passData dt),1000
+			else
+				body=JSON.parse(body)
+				for i in [0... body.length]
+					if body[i].nm == project
+						url = sonar_url+'api/measures/component?componentKey='+body[i].k+'&metricKeys=ncloc,sqale_index,duplicated_lines_density,coverage,bugs,code_smells,vulnerabilities'
+						break
+				if url == undefined
+					dt = "Project not found"
+					msg.send dt
+					setTimeout (->eindex.passData dt),1000
+				else
+					options = {
+					url: url,
+					method: 'GET',
+					auth: {username: sonar_user_id, password: sonar_password}
+					}
+					request.get options, (error, response, body) ->
+						if error
+							msg.send error
+							setTimeout (->eindex.passData error),1000
+						else
+							dt = ''
+							body = JSON.parse(body)
+							if body.errors
+								for i in [0... body.errors.length]
+									msg.send body.errors[i].msg
+							else
+								for i in [0... body.component.measures.length]
+									if body.component.measures[i].metric == 'bugs'
+										dt += '(unknown) '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'code_smells'
+										dt += '(menorah) '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'coverage'
+										dt += '(branch) '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'duplicated_lines_density'
+										dt += '(stash) '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'ncloc'
+										dt += "(continue) Lines of Code: "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'sqale_index'
+										dt += "(goldstar) Technical Debt :" +body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'vulnerabilities'
+										dt += '(failed) '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+								msg.send dt
+								setTimeout (->eindex.passData dt),1000

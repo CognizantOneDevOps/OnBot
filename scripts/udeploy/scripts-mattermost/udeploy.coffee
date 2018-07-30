@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 ###
@@ -81,7 +81,6 @@ uniqueId = (length=8) ->
   id += Math.random().toString(36).substr(2) while id.length < length
   id.substr 0, length
 
-  
 generate_id = require('./mongoConnt')
 
 module.exports = (robot) ->
@@ -96,7 +95,6 @@ module.exports = (robot) ->
 			msg.send 'deploy <app_name> process <process_name> env <environment_name> version <version_number> component <component_name>\n *deploy HelloWorldAppln process HelloWorldApplnProcess env Dev version 3.0 component HelloWorld*\nstart watching *It\'ll notify you if any application/component/resource is created by anybody* ';
 			setTimeout (->index.passData dt),1000
 	)
-		
 	#list components
 	cmd_components=new RegExp('@' + process.env.HUBOT_NAME + ' list components')
 	robot.listen(
@@ -108,7 +106,7 @@ module.exports = (robot) ->
 				if stdout.udeploycomponentslist.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
-						console.log(tckid);
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploycomponentslist.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploycomponentslist',tckid:tckid};
 						data = {"channel": stdout.udeploycomponentslist.admin,"text":"Request from"+payload.username+"Approve Request for listing components","message":"Approve Request for listing components",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploycomponentslist',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -158,7 +156,7 @@ module.exports = (robot) ->
 				if stdout.udeployresourceslist.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
-						console.log(tckid);
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeployresourceslist.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeployresourceslist',tckid:tckid};
 						data = {"channel": stdout.udeployresourceslist.admin,"text":"Request from"+payload.username+"Approve Request for listing resources","message":"Approve Request for listing resources",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeployresourceslist',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -207,7 +205,7 @@ module.exports = (robot) ->
 				if stdout.udeployapllicationslist.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
-						console.log(tckid);
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeployapllicationslist.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeployapllicationslist',tckid:tckid};
 						data = {"channel": stdout.udeployapllicationslist.admin,"text":"Request from"+payload.username+"Approve Request for listing applications","message":"Approve Request for listing applications",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeployapllicationslist',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -259,7 +257,7 @@ module.exports = (robot) ->
 				if stdout.udeploycomponent.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
-						console.log(tckid);
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,component_name:component_name,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploycomponent.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploycomponent',tckid:tckid};
 						data = {"channel": stdout.udeploycomponent.admin,"text":"Request from"+payload.username+"Approve Request for view component","message":"Approve Request for view component",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploycomponent',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -311,7 +309,7 @@ module.exports = (robot) ->
 				if stdout.udeployapplication.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
-						console.log(tckid);
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,application_name:application_name,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeployapplication.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeployapplication',tckid:tckid};
 						data = {"channel": stdout.udeployapplication.admin,"text":"Request from"+payload.username+"Approve Request for view application","message":"Approve Request for view application",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeployapplication',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -364,7 +362,7 @@ module.exports = (robot) ->
 				if stdout.udeploycomponentapplication.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
-						console.log(tckid);
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,componentapplication:componentapplication,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploycomponentapplication.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploycomponentapplication',tckid:tckid};
 						data = {"channel": stdout.udeploycomponentapplication.admin,"text":"Request from"+payload.username+"Approve Request for view components of application","message":"Approve Request for view components of application",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploycomponentapplication',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -416,7 +414,7 @@ module.exports = (robot) ->
 				if stdout.udeployenvironmentapplication.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
-						console.log(tckid);
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,environmentapplication:environmentapplication,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeployenvironmentapplication.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeployenvironmentapplication',tckid:tckid};
 						data = {"channel": stdout.udeployenvironmentapplication.admin,"text":"Request from"+payload.username+"Approve Request for view environment of application","message":"Approve Request for view environment of application",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeployenvironmentapplication',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -468,6 +466,7 @@ module.exports = (robot) ->
 				if stdout.udeploycreateresource.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,resource:resource,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploycreateresource.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploycreateresource',tckid:tckid};
 						data = {"channel": stdout.udeploycreateresource.admin,"text":"Request from"+payload.username+"Approve Request for create resource","message":"Approve Request for create resource",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploycreateresource',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -526,6 +525,7 @@ module.exports = (robot) ->
 				if stdout.udeploydeleteresource.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,resource:resource,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploydeleteresource.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploydeleteresource',tckid:tckid};
 						data = {"channel": stdout.udeploydeleteresource.admin,"text":"Request from"+payload.username+"Approve Request for delete resource","message":"Approve Request for delete resource",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploydeleteresource',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -584,6 +584,7 @@ module.exports = (robot) ->
 				if stdout.udeploycreaterecomponent.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,component:component,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploycreaterecomponent.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploycreaterecomponent',tckid:tckid};
 						data = {"channel": stdout.udeploycreaterecomponent.admin,"text":"Request from"+payload.username+"Approve Request for create component","message":"Approve Request for create component",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploycreaterecomponent',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -643,6 +644,7 @@ module.exports = (robot) ->
 				if stdout.udeploycreatereuser.workflowflag == true
 					generate_id.getNextSequence (err,id) ->	
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,user_name:user_name,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploycreatereuser.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploycreatereuser',tckid:tckid};
 						data = {"channel": stdout.udeploycreatereuser.admin,"text":"Request from"+payload.username+"Approve Request for create user","message":"Approve Request for create user",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploycreatereuser',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -701,6 +703,7 @@ module.exports = (robot) ->
 				if stdout.udeploydeletereuser.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,user_name:user_name,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploydeletereuser.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploydeletereuser',tckid:tckid};
 						data = {"channel": stdout.udeploydeletereuser.admin,"text":"Request from"+payload.username+"Approve Request for delete user","message":"Approve Request for delete user",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploydeletereuser',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -759,6 +762,7 @@ module.exports = (robot) ->
 				if stdout.udeployshowreuser.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,user_name:user_name,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeployshowreuser.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeployshowreuser',tckid:tckid};
 						data = {"channel": stdout.udeployshowreuser.admin,"text":"Request from"+payload.username+"Approve Request for view user","message":"Approve Request for view user",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeployshowreuser',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -808,6 +812,7 @@ module.exports = (robot) ->
 				if stdout.udeploycreatetoken.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeploycreatetoken.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeploycreatetoken',tckid:tckid};
 						data = {"channel": stdout.udeploycreatetoken.admin,"text":"Request from"+payload.username+"Approve Request for create security token","message":"Approve Request for create security token",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeploycreatetoken',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 						options = {
@@ -873,6 +878,7 @@ module.exports = (robot) ->
 				if stdout.udeployappdeploy.workflowflag == true
 					generate_id.getNextSequence (err,id) ->
 						tckid=id
+						#Set APPROVAL_APP_URL
 						payload={botname:process.env.HUBOT_NAME,app_name:app_name,app_process:app_process,env:env,version:version,component:component,username:msg.message.user.name,userid:msg.message.room,approver:stdout.udeployappdeploy.admin,podIp:process.env.MY_POD_IP,message:msg.message.text,callback_id: 'udeployappdeploy',tckid:tckid};
 						data = {"channel": stdout.udeployappdeploy.admin,"text":"Request from"+payload.username+"Approve Request for deploy","message":"Approve Request for deploy",attachments: [{text: 'click approve or reject',fallback: 'Yes or No?',callback_id: 'udeployappdeploy',color: '#3AA3E3',attachment_type: 'default',actions: [{ name: 'Approve', text: 'Approve', type: 'button',"integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Approve",value: tckid}}},{ name: 'Reject', text: 'Reject', type: 'button', "integration": {"url": process.env.APPROVAL_APP_URL,"context": {"action": "Reject",value: tckid}}}]}]}
 
@@ -894,9 +900,16 @@ module.exports = (robot) ->
 					msg.reply 'Your process is in progress. Once it\'s done you\'ll be notified.';
 					app_deploy.app_deploy udeploy_url, udeploy_user_id, udeploy_password, app_name, app_process, env, version, component, (error, stdout, stderr) ->
 						if error == "null"
-							msg.reply stdout;
+							options = {
+							url: process.env.MATTERMOST_INCOME_URL,
+							method: "POST",
+							header: {"Content-type":"application/json"},
+							json: stdout
+							}
+							request.post options, (err,response,body) ->
+								console.log response.body
 						else
-							msg.reply error;
+							msg.send error;
 	)
 	
 	robot.router.post '/udeployappdeploy', (request, response) ->
@@ -906,14 +919,20 @@ module.exports = (robot) ->
 			app_deploy.app_deploy udeploy_url, udeploy_user_id, udeploy_password, data_http.app_name, data_http.app_process, data_http.env, data_http.version, data_http.component, (error, stdout, stderr) ->
 				if error == "null"
 					setTimeout (->index.passData stdout),1000
-					message = 'deploy '+data_http.app_name+'process '+data_http.app_process+'env '+data_http.env+'version '+data_http.version+'component '+data_http.component;
+					message = 'deployed '+data_http.app_name+'process '+data_http.app_process+'env '+data_http.env+'version '+data_http.version+'component '+data_http.component;
 					actionmsg = 'u-Deploy application deployed';
 					statusmsg = 'Success';
 					index.wallData botname, message, actionmsg, statusmsg;
-					robot.messageRoom data_http.userid, '';
+					options = {
+					url: process.env.MATTERMOST_INCOME_URL,
+					method: "POST",
+					header: {"Content-type":"application/json"},
+					json: stdout
+					}
+					request.post options, (err,response,body) ->
+						console.log response.body
 				else
 					setTimeout (->index.passData error),1000
-								
 					robot.messageRoom data_http.userid, error;
 		else
 			robot.messageRoom data_http.userid, 'Your request for deploy was rejected';

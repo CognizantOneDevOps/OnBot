@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 #Description:
@@ -22,6 +22,8 @@
 # HUBOT_JENKINS_URL
 # HUBOT_JENKINS_USER
 # HUBOT_JENKINS_PASSWORD
+# HUBOT_JENKINS_API_TOKEN
+# HUBOT_JENKINS_VERSION
 #
 #COMMANDS:
 # delete job <jobname> -> delete the given jenkins job
@@ -29,13 +31,33 @@
 #Description:
 # "elasticSearch": "^0.9.2"
 # "request": "2.81.0"
-
+jenkins_url=process.env.HUBOT_JENKINS_URL
+jenkins_user=process.env.HUBOT_JENKINS_USER
+jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
+jenkins_api=process.env.HUBOT_JENKINS_API_TOKEN
+jenkins_version=process.env.HUBOT_JENKINS_VERSION
 request = require('request')
 index = require('./index')
 readjson = require './readjson.js'
 finaljson=" ";
 generate_id = require('./mongoConnt')
+crumb = require('./jenkinscrumb.js')
+crumbvalue = ''
 
+options = {
+			url: '',
+			auth: {
+			'user': jenkins_user,
+			'pass': jenkins_api
+			},
+			method: 'POST',
+			headers: {},
+			};
+if jenkins_version >= 2.0
+	crumb.crumb (stderr, stdout) ->
+		console.log stdout
+		if(stdout)
+			crumbvalue=stdout
 module.exports = (robot) ->
 	robot.respond /delete job (.*)/i, (res) ->
 		readjson.readworkflow_coffee (error,stdout,stderr) ->
@@ -57,18 +79,12 @@ module.exports = (robot) ->
 			else
 				#handles regular flow of the command without approval flow
 				jobname=res.match[1]
-				jenkins_url=process.env.HUBOT_JENKINS_URL
-				jenkins_user=process.env.HUBOT_JENKINS_USER
-				jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
 				url=jenkins_url+"/job/"+jobname+"/doDelete"
-				options = {
-				auth: {
-				'user': jenkins_user,
-				'pass': jenkins_pass
-				},
-				method: 'POST',
-				url: url,
-				headers: {  } };
+				options.url=url
+				if jenkins_version >= 2.0
+					options.headers["Jenkins-Crumb"]=crumbvalue
+				else
+					options.auth.pass = jenkins_pass
 				request.post options, (error, response, body) ->
 					if(response.statusCode!=302)
 						dt="Job not found. Make sure you spell the jobname correctly"
@@ -92,14 +108,11 @@ module.exports = (robot) ->
 			jenkins_user=process.env.HUBOT_JENKINS_USER
 			jenkins_pass=process.env.HUBOT_JENKINS_PASSWORD
 			url=jenkins_url+"/job/"+jobname+"/doDelete"
-			options = {
-			auth: {
-			'user': jenkins_user,
-			'pass': jenkins_pass
-			},
-			method: 'POST',
-			url: url,
-			headers: {  } };
+			options.url=url
+			if jenkins_version >= 2.0
+				options.headers["Jenkins-Crumb"]=crumbvalue
+			else
+				options.auth.pass = jenkins_pass
 			request.post options, (error, response, body) ->
 				if(response.statusCode!=302)
 					dt+="Job not found. Make sure you spell the jobname correctly"

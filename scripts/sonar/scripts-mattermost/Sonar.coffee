@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 # Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
+#   
+#   Licensed under the Apache License, Version 2.0 (the "License"); you may not
+#   use this file except in compliance with the License.  You may obtain a copy
+#   of the License at
+#   
+#     http://www.apache.org/licenses/LICENSE-2.0
+#   
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+#   License for the specific language governing permissions and limitations under
+#   the License.
 #-------------------------------------------------------------------------------
 
 ###
@@ -60,7 +60,7 @@ module.exports = (robot) ->
 			return unless message.text
 			message.text.match cmdhelp
 		(msg) ->
-			msg.send "create sonar project <project-id>\nlist sonar projects\nlist sonar users\ndelete sonar user <user-id>\ncreate sonar user <user-id>\ndelete sonar project <project-id>\ngrant sonar <permission-name> <userid> <projectid>\nrevoke sonar <permission-name> <userid> <projectid>"
+			msg.send "create sonar project <project-id>\nlist sonar projects\nlist sonar users\ndelete sonar user <user-id>\ncreate sonar user <user-id>\ndelete sonar project <project-id>\ngrant sonar <permission-name> <userid> <projectid>\nrevoke sonar <permission-name> <userid> <projectid>\ngetMetrics <projectname>"
 	)
 	
 	cmdcreateproj = new RegExp('@' + process.env.HUBOT_NAME + ' create sonar project (.*)')
@@ -594,3 +594,61 @@ module.exports = (robot) ->
 			# Rejected Message send to the user chat room
 			robot.messageRoom data_http.userid, dt;
 			robot.messageRoom data_http.userid, 'Sorry, You are not authorized to revoke permissions.';
+	cmdmetrics = new RegExp('@'+process.env.HUBOT_NAME+' getMetrics (.*)')
+	robot.listen(
+		(message) ->
+			return unless message.text
+			message.text.match cmdmetrics
+		(msg) ->
+			project = msg.match[1]
+		request.get sonar_url+'api/projects', (error, response, body) ->
+			if error
+				console.log error
+				dt = "Error! Please check logs."
+				msg.send dt
+				setTimeout (->eindex.passData dt),1000
+			else
+				body=JSON.parse(body)
+				for i in [0... body.length]
+					if body[i].nm == project
+						url = sonar_url+'api/measures/component?componentKey='+body[i].k+'&metricKeys=ncloc,sqale_index,duplicated_lines_density,coverage,bugs,code_smells,vulnerabilities'
+						break
+				if url == undefined
+					dt = "Project not found"
+					msg.send dt
+					setTimeout (->eindex.passData dt),1000
+				else
+					options = {
+					url: url,
+					method: 'GET',
+					auth: {username: sonar_user_id, password: sonar_password}
+					}
+					request.get options, (error, response, body) ->
+						if error
+							msg.send error
+							setTimeout (->eindex.passData error),1000
+						else
+							dt = ''
+							body = JSON.parse(body)
+							if body.errors
+								for i in [0... body.errors.length]
+									msg.send body.errors[i].msg
+							else
+								for i in [0... body.component.measures.length]
+									if body.component.measures[i].metric == 'bugs'
+										dt += ':beetle: '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'code_smells'
+										dt += ':radioactive: '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'coverage'
+										dt += ':o: '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'duplicated_lines_density'
+										dt += ':aquarius: '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'ncloc'
+										dt += ":spiral_notepad: Lines of Code: "+body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'sqale_index'
+										dt += ":woman_technologist: Technical Debt :" +body.component.measures[i].value+"\n"
+									else if body.component.measures[i].metric == 'vulnerabilities'
+										dt += ':unlock: '+body.component.measures[i].metric+": "+body.component.measures[i].value+"\n"
+								msg.send dt
+								setTimeout (->eindex.passData dt),1000
+	)

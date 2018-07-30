@@ -1,18 +1,18 @@
 /*******************************************************************************
 *Copyright 2018 Cognizant Technology Solutions
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); you may not
-* use this file except in compliance with the License.  You may obtain a copy
-* of the License at
-* 
-*   http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-* License for the specific language governing permissions and limitations under
-* the License.
- ******************************************************************************/
+*  
+*  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+*  use this file except in compliance with the License.  You may obtain a copy
+*  of the License at
+*  
+*    http://www.apache.org/licenses/LICENSE-2.0
+*  
+*  Unless required by applicable law or agreed to in writing, software
+*  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+*  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+*  License for the specific language governing permissions and limitations under
+*  the License.
+******************************************************************************/
 
 var exec = require('child_process').exec;
 
@@ -31,7 +31,7 @@ var check = '';
 
 var result = 'false';
 
-var function_call = function (name, repo, branch, pythonservice, clone_link, folder_name_in_container, callback_for_token_coffee) {
+var function_call = function (name, repo, branch, pythonservice, url_for_pythonservice, folder_name_in_container, callback_for_token_coffee) {
 
 name1 = name;
 repo1 = repo;
@@ -122,10 +122,12 @@ fs.readFile(filepath, function (err, data) {
         
 
 };
+if(process.env.HUBOT_GIT_SOFTWARE == 'GitHub')
+ {url_for_pythonservice = 'http://'+entire_url_from_config.substring(entire_url_from_config.indexOf('github.com/'),entire_url_from_config.length)}
 jsonobj_new.ref = ref_name_hold_url;
 jsonobj_new.project.path_with_namespace = user_name_hold_url[3].concat("/").concat(repo1);
 jsonobj_new.project.namespace = name1;
-jsonobj_new.project.http_url = entire_url_from_config;
+jsonobj_new.project.http_url = url_for_pythonservice;
 
 
 for(i=0;i<1;i++){
