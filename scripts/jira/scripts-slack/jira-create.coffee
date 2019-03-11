@@ -1,19 +1,3 @@
-#-------------------------------------------------------------------------------
-# Copyright 2018 Cognizant Technology Solutions
-# 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may not
-# use this file except in compliance with the License.  You may obtain a copy
-# of the License at
-# 
-#   http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-# License for the specific language governing permissions and limitations under
-# the License.
-#-------------------------------------------------------------------------------
-
 ###
 Set of bot commands
 1. Create Issue: create jira issue in <project> with summary <summary> description <description> and issue type <issue_type>
@@ -68,7 +52,7 @@ module.exports = (robot) ->
 				#Generate Random Ticket Number
 				generate_id.getNextSequence (err,id) ->
 					tckid=id
-					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.id,podIp:process.env.MY_POD_IP,"callback_id":"jiracreateissue",Proj_Key:Proj_Key,summary:summary,description:description,issue_type:issue_type}
+					payload={botname:process.env.HUBOT_NAME,username:msg.message.user.name,userid:msg.message.user.room,podIp:process.env.MY_POD_IP,"callback_id":"jiracreateissue",Proj_Key:Proj_Key,summary:summary,description:description,issue_type:issue_type}
 					message = {"text": "Request from "+user+" to create jira issue in project "+Proj_Key+" of issue type "+issue_type,"attachments": [{"text": "You can Approve or Reject","fallback": "failed to respond","callback_id": "jiracreateissue","color":"#3AA3E3","attachment_type":"default","actions":[{"name":"Approve","text":"Approve","type":"button","value":tckid},{"name":"Rejected","text": "Reject","type": "button","value": tckid,"style": "danger",confirm: {'title': 'Are you sure?','text': 'Do you want to Reject?','ok_text': 'Reject','dismiss_text': 'No'}}]}]}
 					robot.messageRoom(stdout.jiracreateissue.adminid, message);
 					msg.send 'Your request is waiting for approval by '+stdout.jiracreateissue.admin
@@ -79,10 +63,9 @@ module.exports = (robot) ->
 			else
 				create_issue.create_issue jira_url, jira_user, jira_password , Proj_Key, summary, description, issue_type, (error, stdout, stderr) ->
 					if stdout
-						finalmsg = 'Jira Issue Created Successfully With ID : '.concat(Proj_Key);
 						# Send data to elastic search for logs
 						setTimeout (->eindex.passData finalmsg),1000
-						msg.send finalmsg;
+						msg.send stdout
 						# Send data for wall notification and call from file hubot-elasticsearch-logger/index.js
 						actionmsg = 'Jira Issue Created Successfully';
 						statusmsg = 'Success';
@@ -106,11 +89,11 @@ module.exports = (robot) ->
 			issue_type = request.body.issue_type;
 			# Call from create_issue file for issue creation 
 			create_issue.create_issue jira_url, jira_user, jira_password , Proj_Key, summary, description, issue_type, (error, stdout, stderr) ->
+				console.log(error+ " "+stdout+ " "+stderr)
 				if stdout
-					finalmsg = 'Jira Issue Created Successfully With ID : '.concat(Proj_Key);
 					# Send data to elastic search for logs
 					setTimeout (->eindex.passData finalmsg),1000
-					robot.messageRoom data_http.userid, finalmsg;
+					robot.messageRoom data_http.userid, stdout
 					# Send data to elastic search for wall notification
 					message = 'create jira issue in '+ Proj_Key + ' with summary '+ summary + ' description '+ description + ' and issue type '+ issue_type;
 					actionmsg = 'Jira Issue Created';
@@ -194,7 +177,7 @@ module.exports = (robot) ->
 			setTimeout (->eindex.passData dt),1000
 			robot.messageRoom data_http.userid, dt;
 			robot.messageRoom data_http.userid, 'Sorry, You are not authorized to assign task to assignee.';
-	
+
 	robot.respond /edit jira issue (.*) with description (.*) and comment (.*)/i, (msg) ->
 		message = "Jira Issue Edited";
 		Jir_ticket = msg.match[1]
@@ -262,7 +245,7 @@ module.exports = (robot) ->
 			setTimeout (->eindex.passData dt),1000
 			robot.messageRoom data_http.userid, dt;
 			robot.messageRoom data_http.userid, 'Sorry, You are not authorized to edit the issue.';
-	
+
 	robot.respond /add comment (.*) to jira issue (.*)/i, (res) ->
 		message = res.match[0]
 		Jir_ticket = res.match[2]
@@ -330,7 +313,7 @@ module.exports = (robot) ->
 			setTimeout (->eindex.passData dt),1000
 			robot.messageRoom data_http.userid, dt;
 			robot.messageRoom data_http.userid, 'Sorry, You are not authorized to add comment.';
-	
+
 	robot.respond /update summary of issue (.*) as (.*)/i, (msg) ->
 		message = msg.match[0]
 		Jir_ticket = msg.match[1]
@@ -396,7 +379,7 @@ module.exports = (robot) ->
 			setTimeout (->eindex.passData dt),1000
 			robot.messageRoom data_http.userid, dt;
 			robot.messageRoom data_http.userid, 'Sorry, You are not authorized to update summary.';
-	
+
 	robot.respond /upcoming status of issue (.*)/i, (msg) ->
 		Jir_ticket = msg.match[1]
 		# call from status_issue file to know the upcoming status
@@ -414,7 +397,7 @@ module.exports = (robot) ->
 				msg.send 'You Can Switch To These Status'
 				for i in[0...length]
 					msg.send (a[i].name)
-	
+
 	robot.respond /change status of issue (.*) to (.*)/i, (msg) ->
 		message = msg.match[0]
 		Jir_ticket = msg.match[1]
@@ -447,7 +430,7 @@ module.exports = (robot) ->
 						length = response.body.transitions.length
 						for i in[0...length]
 							a[i] = {"name":response.body.transitions[i].name,"id":response.body.transitions[i].id}
-                        for i in [0...length]
+						for i in [0...length]
 							if (status == a[i].name)
 								flag = 1
 								status = a[i].id
@@ -492,7 +475,7 @@ module.exports = (robot) ->
 					length = response.body.transitions.length
 					for i in[0...length]
 						a[i] = {"name":response.body.transitions[i].name,"id":response.body.transitions[i].id}
-                    for i in [0...length]
+					for i in [0...length]
 						if (status == a[i].name)
 							flag = 1
 							status = a[i].id

@@ -1,0 +1,12 @@
+<step id="RUNNER_1" name="build" type="Maven2">
+<properties count="9">
+<property name="goals" value="clean install"/>
+<property name="maven.path" value="%teamcity.tool.maven.DEFAULT%"/>
+<property name="pomLocation" value="pom.xml"/>
+<property name="teamcity.coverage.emma.include.source" value="true"/>
+<property name="teamcity.coverage.emma.instr.parameters" value="-ix -*Test*"/>
+<property name="teamcity.coverage.idea.includePatterns" value="*"/>
+<property name="teamcity.coverage.jacoco.patterns" value="+:*"/>
+<property name="teamcity.step.mode" value="default"/>
+<property name="userSettingsSelection" value="userSettingsSelection:default"/></properties>
+</step>

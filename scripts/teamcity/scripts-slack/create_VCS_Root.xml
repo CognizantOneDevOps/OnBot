@@ -1,0 +1,16 @@
+<vcs-root id="zzxy" name="zzxy" vcsName="jetbrains.git" href="/app/rest/vcs-roots/id:zzxy">
+<project id="zzxy" name="zzxy" parentProjectId="_Root" href="/app/rest/projects/id:zzxy" webUrl="http://34.224.165.0:8111/project.html?projectId=zzxy"/>
+<properties count="11">
+<property name="agentCleanFilesPolicy" value="ALL_UNTRACKED"/>
+<property name="agentCleanPolicy" value="ON_BRANCH_CHANGE"/>
+<property name="authMethod" value="ANONYMOUS"/>
+<property name="branch" value="refs/heads/master"/>
+<property name="ignoreKnownHosts" value="true"/>
+<property name="submoduleCheckout" value="CHECKOUT"/>
+<property name="url" value="https://github.com/TamilselvanCognizant/onlinebanking"/>
+<property name="useAlternates" value="true"/>
+<property name="username" value="TamilselvanCognizant"/>
+<property name="usernameStyle" value="USERID"/>
+</properties>
+<vcsRootInstances href="/app/rest/vcs-root-instances?locator=vcsRoot:(id:zzxy)"/>
+</vcs-root>

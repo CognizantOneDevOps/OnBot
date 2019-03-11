@@ -1,0 +1,3 @@
+<buildType id="zzxy" name="zzxy" projectId="zzxy" >
+<project id="zzxy" name="zzxy" parentProjectId="_Root" href="/app/rest/buildTypes/id:zzxy" webUrl="process.env.HUBOT_TEAMCITY_URL/viewType.html?buildTypeId=zzxy"/>
+</buildType>
