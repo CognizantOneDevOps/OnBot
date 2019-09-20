@@ -1,0 +1,35 @@
+/*******************************************************************************
+*Copyright 2018 Cognizant Technology Solutions
+*  
+*  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+*  use this file except in compliance with the License.  You may obtain a copy
+*  of the License at
+*  
+*    http://www.apache.org/licenses/LICENSE-2.0
+*  
+*  Unless required by applicable law or agreed to in writing, software
+*  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+*  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+*  License for the specific language governing permissions and limitations under
+*  the License.
+******************************************************************************/
+
+var fs = require('fs')
+
+function readworkflow(callback) {
+	console.log("In reading json");
+ //var cmd=method;
+ var obj = '';
+ //console.log(obj);
+
+
+//console.log(fs.readFileSync('./workflow.json', 'utf8'));
+obj = JSON.parse(fs.readFileSync('./workflow.json', 'utf8'));
+ //console.log(obj)
+ callback(null, obj,null);
+
+}
+module.exports = {
+  readworkflow_coffee: readworkflow	// MAIN FUNCTION
+  
+}
