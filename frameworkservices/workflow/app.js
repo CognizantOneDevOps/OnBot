@@ -18,12 +18,17 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var request = require('request')
 var mongojs = require('mongojs');
+require('dotenv').config()
+var fs = require('fs')
+var privateKey = fs.readFileSync('./server.key')
+var certificate = fs.readFileSync('./server.crt')
+var https = require('https')
 //MongoDB connection
 var db = mongojs(process.env.MONGO_IP+'/'+process.env.MONGO_DB,[process.env.MONGO_COLL]);
-require('dotenv').config()
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
-app.use(bodyParser.json());
+//app.use(bodyParser.json())
+
 app.post('/approval', (req, res) =>{
         console.log(req.body.context)
          db.ticketgenerator.findAndModify({query:{ticketid:req.body.context.value},
@@ -46,9 +51,12 @@ app.post('/approval', (req, res) =>{
         },
         body:botpayload,
         json: true
-                }
+      }
+	if(docs.payload.podIp.indexOf(':')!=-1){
+		options.uri = 'http://'+docs.payload.podIp+'/'+docs.payload.callback_id+''
+	}
 
-                request(options, (error, response, body) => {
+       request(options, (error, response, body) => {
         console.log(error);
 
         console.log(body);
@@ -95,18 +103,19 @@ app.post('/hubot/msg-callback', urlencodedParser, (req, res) =>{
         if(req.body.payload){
 
     var actionJSONPayload = JSON.parse(req.body.payload) // parse URL-encoded payload JSON string
-    //console.log(actionJSONPayload);
         var postPayload=actionJSONPayload.actions[0].value;
         var tckid=actionJSONPayload.actions[0].value;
         var reqstatus=actionJSONPayload.actions[0].name;
         var approver=actionJSONPayload.user.name;
         var podIp=actionJSONPayload.podIp
 		postPayload.action =actionJSONPayload.actions[0].name;
-		console.log(postPayload.action)
+		console.log(reqstatus)
        var message = {
 	"attachments":[{"fields":[{"title":"Request History","value":actionJSONPayload.original_message.attachments[0].text},{"title":"Action Taken","value":reqstatus,"short":"true"},{"title":reqstatus+" by","value":"@"+approver,"short":"true"}],"color":"#82E0AA"}],
 	"replace_original": true
     }
+	if(reqstatus=='Rejected' || reqstatus=='Reject' || reqstatus=='reject' || reqstatus=='rejected')
+	{message.attachments[0].color="#E6310C"}
         sendMessageToSlackResponseURL(actionJSONPayload.response_url, message);
         
         }
@@ -118,6 +127,7 @@ app.post('/hubot/msg-callback', urlencodedParser, (req, res) =>{
         var msg=actionJSONPayload.item.message;
     var postPayload=[];
         postPayload=msg.message.split(' ');
+
 var tckid=parseInt(postPayload[1])
         var reqstatus='';
         var approver=msg.from.name;
@@ -179,9 +189,12 @@ var tckid=parseInt(postPayload[1])
 			},
 			json:botpayload
         }
+	if(docs.payload.podIp.indexOf(':')!=-1){
+		options.uri = 'http://'+docs.payload.podIp+'/'+docs.payload.callback_id+''
+	}
         request(options, (error, response, body) => {
         console.log(error);
- 
+	console.log("inside post "+options.uri) 
         console.log(body);
                 });
                 }
@@ -192,7 +205,70 @@ var tckid=parseInt(postPayload[1])
 
 })
 
-var server = app.listen(process.env.MIDWAREPORT, function () {
-    console.log("Listening on port %s...", server.address().port);
+app.post('/msteams/:decision', urlencodedParser, (req, res) =>{
+	var tckid = JSON.parse(Object.keys(req.body)[0]).tckid
+	console.log(req.params.decision+" "+tckid)
+	console.log(req)
+	db.ticketgenerator.findAndModify({query:{ticketid:parseInt(tckid)},
+                update:{$set:{approvedby:"Admin",status:req.params.decision}},
+                new:false},function(err,docs){
+						
+						console.log(docs);
+						
+                if(docs){
+                var botpayload=docs.payload
+                botpayload["action"]=req.params.decision
+                botpayload["approver"]="Admin"
+                
+                console.log(botpayload); 
+		var options = {
+			uri: 'http://'+docs.payload.podIp+':'+process.env.BOT_IP+'/'+docs.payload.callback_id+'',
+			method: 'POST',
+			headers: {
+            'Content-type': 'application/json'
+			},
+			json:botpayload
+        }
+	if(docs.payload.podIp.indexOf(':')!=-1){
+		options.uri = 'http://'+docs.payload.podIp+'/'+docs.payload.callback_id+''
+	}
+	request(options, (error, response, body) => {
+		console.log(error);
+		console.log("inside post "+options.uri) 
+		console.log(body);
+	 });
+        }
+		else{
+				console.log(err)
+		}
+		});
+	
+	var appres = {
+  "@@type": "MessageCard",
+  "@@context": "http://schema.org/extensions",
+  "summary": "Feedback",
+  "themeColor": "EA370B",
+  "sections": [
+    {
+      "startGroup": true,
+      "title": "**Thanks for your response**",
+      "facts": [
+        {
+          "name": "Action Taken: ",
+          "value": req.params.decision
+        }
+      ]
+    }
+  ]
+}
+	if(req.params.decision=='Approved' || req.params.decision =='approved')
+		appres.themeColor = "63BC47"
+    res.set("token",req.headers.authorization)
+	res.set("CARD-UPDATE-IN-BODY",true)
+	res.json(appres)
 })
 
+var credentials = {key: privateKey, cert: certificate}
+https.createServer(credentials, app).listen(process.env.MIDWAREPORT, function () {
+  console.log('app listening on port %s...',process.env.MIDWAREPORT)
+})
